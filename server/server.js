@@ -5,13 +5,13 @@ import bodyParser from 'body-parser'
 import sockjs from 'sockjs'
 import { renderToStaticNodeStream } from 'react-dom/server'
 import React from 'react'
+
 import axios from 'axios'
+import { readFile, writeFile, stat, unlink, opendir, mkdir } from 'fs/promises'
 
 import cookieParser from 'cookie-parser'
 import config from './config'
 import Html from '../client/html'
-
-const { readFile, writeFile, stat, unlink } = require('fs').promises
 
 require('colors')
 
@@ -54,14 +54,15 @@ server.get('/', (req, res) => {
   })
 })
 
-const dataFile = `${__dirname}/../database/users.json`
+const dataDir = `${__dirname}/../database`
+const dataFile = `${dataDir}/users.json`
 const serverUrl = 'https://jsonplaceholder.typicode.com/users'
 
 const apiPath = '/api/v1'
 const usersRoute = `${apiPath}/users`
 
 const loginMethod = (req, res, next) => {
-  res.set('x-skillcrucial-user', '1fcc2edd-ccb1-461a-9070-039969bae1be');
+  res.set('x-skillcrucial-user', '1fcc2edd-ccb1-461a-9070-039969bae1be')
   res.set('Access-Control-Expose-Headers', 'X-SKILLCRUCIAL-USER')
 
   next()
@@ -99,6 +100,12 @@ const deleteFile = async () => {
 
 const checkDataFile = async () => {
   await checkFile().catch(async () => {
+    const dir = await opendir(dataDir)
+
+    if (!dir) {
+      await mkdir(dataDir)
+    }
+
     const newData = await getData()
 
     writeData(newData)
