@@ -100,11 +100,9 @@ const deleteFile = async () => {
 
 const checkDataFile = async () => {
   await checkFile().catch(async () => {
-    const dir = await opendir(dataDir)
-
-    if (!dir) {
+    await opendir(dataDir).catch(async () => {
       await mkdir(dataDir)
-    }
+    })
 
     const newData = await getData()
 
