@@ -149,7 +149,7 @@ server.post(usersRoute, loginMethod, async (req, res) => {
       res.json({ status: 'error', error: err })
     })
 
-  const userID = users.length + 1
+  const userID = users[users.length - 1].id + 1
   const newData = { ...{ id: userID }, ...req.body }
 
   writeData([...users, newData])
